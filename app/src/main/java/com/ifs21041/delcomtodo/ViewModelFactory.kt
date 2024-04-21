@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.ifs21041.delcomtodo.data.repository.AuthRepository
+import com.ifs21041.delcomtodo.data.repository.LocalTodoRepository
 import com.ifs21041.delcomtodo.data.repository.LostRepository
 import com.ifs21041.delcomtodo.data.repository.TodoRepository
 import com.ifs21041.delcomtodo.data.repository.UserRepository
@@ -20,6 +21,7 @@ class ViewModelFactory(
     private val userRepository: UserRepository,
     private val todoRepository: TodoRepository,
     private val lostRepository: LostRepository,
+    private val localTodoRepository: LocalTodoRepository
 ) : ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -40,13 +42,17 @@ class ViewModelFactory(
                 ProfileViewModel
                     .getInstance(authRepository, userRepository) as T
             }
-            modelClass.isAssignableFrom(TodoViewModel::class.java) -> {
-                TodoViewModel
-                    .getInstance(todoRepository) as T
-            }
+//            modelClass.isAssignableFrom(TodoViewModel::class.java) -> {
+//                TodoViewModel
+//                    .getInstance(todoRepository) as T
+//            }
             modelClass.isAssignableFrom(LostfoundViewModel::class.java) -> {
                 LostfoundViewModel
                     .getInstance(lostRepository) as T
+            }
+            modelClass.isAssignableFrom(TodoViewModel::class.java) -> {
+                TodoViewModel
+                    .getInstance(todoRepository, localTodoRepository) as T
             }
             else -> throw IllegalArgumentException(
                 "Unknown ViewModel class: " + modelClass.name
@@ -63,7 +69,8 @@ class ViewModelFactory(
                     Injection.provideAuthRepository(context),
                     Injection.provideUserRepository(context),
                     Injection.provideTodoRepository(context),
-                    Injection.provideLostfoundRepository(context)
+                    Injection.provideLostfoundRepository(context),
+                    Injection.provideLocalTodoRepository(context),
                 )
             }
             return INSTANCE as ViewModelFactory

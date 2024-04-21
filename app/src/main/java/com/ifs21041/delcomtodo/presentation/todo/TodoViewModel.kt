@@ -4,14 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.ifs21041.delcomtodo.ViewModelFactory
+import com.ifs21041.delcomtodo.data.local.entity.DelcomTodoEntity
 import com.ifs21041.delcomtodo.data.remote.MyResult
 import com.ifs21041.delcomtodo.data.remote.response.DataAddTodoResponse
 import com.ifs21041.delcomtodo.data.remote.response.DelcomResponse
 import com.ifs21041.delcomtodo.data.remote.response.DelcomTodoResponse
+import com.ifs21041.delcomtodo.data.repository.LocalTodoRepository
 import com.ifs21041.delcomtodo.data.repository.TodoRepository
 
 class TodoViewModel(
-    private val todoRepository: TodoRepository
+    private val todoRepository: TodoRepository,
+    private val localTodoRepository: LocalTodoRepository
 ) : ViewModel() {
     fun getTodo(todoId: Int): LiveData<MyResult<DelcomTodoResponse>>{
         return todoRepository.getTodo(todoId).asLiveData()
@@ -41,15 +44,33 @@ class TodoViewModel(
     fun deleteTodo(todoId: Int): LiveData<MyResult<DelcomResponse>> {
         return todoRepository.deleteTodo(todoId).asLiveData()
     }
+
+    fun getLocalTodos(): LiveData<List<DelcomTodoEntity>?> {
+        return localTodoRepository.getAllTodos()
+    }
+
+    fun getLocalTodo(todoId: Int): LiveData<DelcomTodoEntity?> {
+        return localTodoRepository.get(todoId)
+    }
+    fun insertLocalTodo(todo: DelcomTodoEntity) {
+        localTodoRepository.insert(todo)
+    }
+
+    fun deleteLocalTodo(todo: DelcomTodoEntity) {
+        localTodoRepository.delete(todo)
+    }
+
     companion object {
         @Volatile
         private var INSTANCE: TodoViewModel? = null
         fun getInstance(
-            todoRepository: TodoRepository
+            todoRepository: TodoRepository,
+            localTodoRepository: LocalTodoRepository,
         ): TodoViewModel {
             synchronized(ViewModelFactory::class.java) {
                 INSTANCE = TodoViewModel(
-                    todoRepository
+                    todoRepository,
+                    localTodoRepository,
                 )
             }
             return INSTANCE as TodoViewModel

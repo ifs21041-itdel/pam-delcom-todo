@@ -7,7 +7,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.ifs21041.delcomtodo.R
 import com.ifs21041.delcomtodo.ViewModelFactory
+import com.ifs21041.delcomtodo.data.local.entity.DelcomTodoEntity
 import com.ifs21041.delcomtodo.data.model.DelcomTodo
 import com.ifs21041.delcomtodo.data.remote.MyResult
 import com.ifs21041.delcomtodo.data.remote.response.TodoResponse
@@ -20,6 +22,9 @@ class TodoDetailActivity : AppCompatActivity() {
         ViewModelFactory.getInstance(this)
     }
     private var isChanged: Boolean = false
+
+    private var isFavorite: Boolean = false
+    private var delcomTodo: DelcomTodoEntity? = null
     private val launcher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -126,6 +131,39 @@ class TodoDetailActivity : AppCompatActivity() {
                     }
                 }
             }
+            ivTodoDetailActionFavorite.setOnClickListener {
+                if(isFavorite){
+                    setFavorite(false)
+                    if(delcomTodo != null){
+                        viewModel.deleteLocalTodo(delcomTodo!!)
+                    }
+
+                    Toast.makeText(
+                        this@TodoDetailActivity,
+                        "Todo berhasil dihapus dari daftar favorite",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }else{
+                    delcomTodo = DelcomTodoEntity(
+                        id = todo.id,
+                        title = todo.title,
+                        description = todo.description,
+                        isFinished = todo.isFinished,
+                        cover = todo.cover,
+                        createdAt = todo.createdAt,
+                        updatedAt = todo.updatedAt,
+                    )
+
+                    setFavorite(true)
+                    viewModel.insertLocalTodo(delcomTodo!!)
+
+                    Toast.makeText(
+                        this@TodoDetailActivity,
+                        "Todo berhasil ditambahkan ke daftar favorite",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
             ivTodoDetailActionDelete.setOnClickListener {
                 val builder = AlertDialog.Builder(this@TodoDetailActivity)
                 builder.setTitle("Confirm Delete Todo")
@@ -157,6 +195,17 @@ class TodoDetailActivity : AppCompatActivity() {
             }
         }
     }
+    private fun setFavorite(status: Boolean){
+        isFavorite = status
+        if(status){
+            binding.ivTodoDetailActionFavorite
+                .setImageResource(R.drawable.ic_favorite_24)
+        }else{
+            binding.ivTodoDetailActionFavorite
+                .setImageResource(R.drawable.ic_favorite_border_24)
+        }
+    }
+
     private fun observeDeleteTodo(todoId: Int) {
         showComponent(false)
         showLoading(true)

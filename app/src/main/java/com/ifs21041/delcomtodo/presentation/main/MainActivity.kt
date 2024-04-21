@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ifs21041.delcomtodo.R
@@ -23,6 +24,7 @@ import com.ifs21041.delcomtodo.presentation.login.LoginActivity
 import com.ifs21041.delcomtodo.presentation.lostandfound.LostfoundActivity
 import com.ifs21041.delcomtodo.presentation.profile.ProfileActivity
 import com.ifs21041.delcomtodo.presentation.todo.TodoDetailActivity
+import com.ifs21041.delcomtodo.presentation.todo.TodoFavoriteActivity
 import com.ifs21041.delcomtodo.presentation.todo.TodoManageActivity
 
 class MainActivity : AppCompatActivity() {
@@ -78,6 +80,10 @@ class MainActivity : AppCompatActivity() {
                 R.id.mainMenuLogout -> {
                     viewModel.logout()
                     openLoginActivity()
+                    true
+                }
+                R.id.mainMenuFavoriteTodos -> {
+                    openFavoriteTodoActivity()
                     true
                 }
                 else -> false
@@ -233,6 +239,14 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra(TodoManageActivity.KEY_IS_ADD, true)
         launcher.launch(intent)
     }
+    private fun openFavoriteTodoActivity() {
+        val intent = Intent(
+            this@MainActivity,
+            TodoFavoriteActivity::class.java
+        )
+        launcher.launch(intent)
+    }
+
     private fun openLFActivity() {
         val intent = Intent(applicationContext, LostfoundActivity::class.java)
         intent.flags =
